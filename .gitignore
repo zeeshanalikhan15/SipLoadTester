@@ -1,2 +1,4 @@
 /bin
 /logs
+/obj/Debug/*
+/obj/Release/*
