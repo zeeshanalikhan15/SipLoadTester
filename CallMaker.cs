@@ -34,8 +34,8 @@ namespace SipLoadTester
                 var userAgent = new SIPUserAgent(_sipTransport, null);
 
                 var callDescriptor = new SIPCallDescriptor(
-                    _username, // username
-                    _password, // password
+                    null, // username - try without since we're already registered
+                    null, // password - try without since we're already registered
                     $"sip:{_externalDomain}", // destination URI
                     $"sip:{_username}@{_sipDomain}", // from
                     null, // to
