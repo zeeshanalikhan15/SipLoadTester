@@ -18,8 +18,27 @@ The script examines the following IP address sources from your CSV log:
 
 ## Prerequisites
 
-- Ruby installed on your system
+- **Ruby 3.4.5** (managed with mise - see `.tool-versions` file)
 - CSV file generated from SIP Load Tester (with successful call records)
+
+### Ruby Installation with mise
+
+This project uses [mise](https://mise.jdx.dev/) for Ruby version management. The required Ruby version is specified in `.tool-versions`.
+
+**Install mise:**
+```bash
+curl https://mise.run | sh
+```
+
+**Install the required Ruby version:**
+```bash
+mise install
+```
+
+**Verify installation:**
+```bash
+ruby --version
+```
 
 ## Usage
 
