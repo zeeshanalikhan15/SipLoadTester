@@ -46,7 +46,8 @@ Edit the `appsettings.json` file with your SIP provider credentials:
     "Username": "your-username",
     "Password": "your-password",
     "ExternalDomain": "target-domain.provider.com",
-    "CallCount": 100
+    "CallCount": 100,
+    "CallDelayMs": 5000
   },
   "LogSettings": {
     "LogDirectory": "logs"
@@ -60,6 +61,7 @@ Edit the `appsettings.json` file with your SIP provider credentials:
 - **Password**: Your SIP account password
 - **ExternalDomain**: Target domain to call for testing
 - **CallCount**: Number of calls to make (default: 100)
+- **CallDelayMs**: Duration in milliseconds to wait during each call before hanging up (default: 5000ms = 5 seconds)
 - **LogDirectory**: Directory where logs and CSV files will be saved
 
 ### 3. Build the Application
@@ -82,9 +84,11 @@ dotnet run
 ### Call Execution
 1. **DNS Resolution**: Resolves target domain to IP address
 2. **SIP Call Initiation**: Places outbound call to external domain
-3. **Message Capture**: Intercepts all SIP messages (requests/responses)
-4. **IP Extraction**: Analyzes messages for IP addresses from multiple sources
-5. **Data Logging**: Records all discovered information
+3. **Call Duration**: Maintains active call for configured duration (`CallDelayMs`)
+4. **Message Capture**: Intercepts all SIP messages (requests/responses)
+5. **IP Extraction**: Analyzes messages for IP addresses from multiple sources
+6. **Call Termination**: Properly hangs up the call
+7. **Data Logging**: Records all discovered information
 
 ### IP Address Sources
 
@@ -151,15 +155,22 @@ CallTime,CallId,DestinationDomain,ResolvedDestinationIp,CallStatus,ResponseCode,
 
 ### Basic Load Test
 ```bash
-# Configure for 50 calls to test domain
-# Edit appsettings.json: "CallCount": 50
+# Configure for 50 calls with 5-second duration each
+# Edit appsettings.json: "CallCount": 50, "CallDelayMs": 5000
 dotnet run
 ```
 
 ### High-Volume Testing
 ```bash
-# Configure for 1000 calls
-# Edit appsettings.json: "CallCount": 1000
+# Configure for 1000 calls with shorter 2-second duration
+# Edit appsettings.json: "CallCount": 1000, "CallDelayMs": 2000
+dotnet run
+```
+
+### Extended Call Duration Testing
+```bash
+# Configure for longer calls (30 seconds each) to capture more data
+# Edit appsettings.json: "CallCount": 10, "CallDelayMs": 30000
 dotnet run
 ```
 

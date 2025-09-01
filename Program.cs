@@ -13,25 +13,6 @@ namespace SipLoadTester
 {
 	class Program
 	{
-		public class SipSettings
-		{
-			public string SipDomain { get; set; }
-			public string Username { get; set; }
-			public string Password { get; set; }
-			public string ExternalDomain { get; set; }
-			public int CallCount { get; set; } = 100;
-		}
-
-		public class LogSettings
-		{
-			public string LogDirectory { get; set; }
-		}
-
-		public class AppConfig
-		{
-			public SipSettings SipSettings { get; set; }
-			public LogSettings LogSettings { get; set; }
-		}
 
 		static async Task Main(string[] args)
 		{
@@ -123,7 +104,8 @@ namespace SipLoadTester
 				config.SipSettings.Password,
 				config.SipSettings.SipDomain,
 				config.SipSettings.ExternalDomain,
-				sipMessageLogger
+				sipMessageLogger,
+				config.SipSettings.CallDelayMs
 			);
 
 			for (int i = 0; i < config.SipSettings.CallCount; i++)

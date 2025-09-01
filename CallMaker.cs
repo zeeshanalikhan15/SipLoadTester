@@ -18,8 +18,9 @@ namespace SipLoadTester
         private readonly string _sipDomain;
         private readonly string _externalDomain;
         private readonly SipMessageLogger _sipMessageLogger;
+        private readonly int _callDelayMs;
 
-        public CallMaker(SIPTransport sipTransport, string username, string password, string sipDomain, string externalDomain, SipMessageLogger sipMessageLogger)
+        public CallMaker(SIPTransport sipTransport, string username, string password, string sipDomain, string externalDomain, SipMessageLogger sipMessageLogger, int callDelayMs = 5000)
         {
             _sipTransport = sipTransport;
             _username = username;
@@ -27,6 +28,7 @@ namespace SipLoadTester
             _sipDomain = sipDomain;
             _externalDomain = externalDomain;
             _sipMessageLogger = sipMessageLogger;
+            _callDelayMs = callDelayMs;
         }
 
         public async Task MakeCall()
@@ -90,7 +92,7 @@ namespace SipLoadTester
                     Console.WriteLine($"Call {callId} to {_externalDomain} initiated successfully.");
                     
                     // Wait a bit before hanging up (simulate call duration)
-                    await Task.Delay(2000);
+                    await Task.Delay(_callDelayMs);
                     
                     // Properly end the call
                     userAgent.Hangup();
