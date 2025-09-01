@@ -111,83 +111,26 @@ namespace SipLoadTester
 				return;
 			}
 
-            Console.ReadLine();
 
-			// Loop for the number of calls
-			/*for (int i = 0; i < config.SipSettings.CallCount; i++)
+			// Make outbound calls using external domain
+			var callMaker = new CallMaker(
+				sipTransport,
+				config.SipSettings.Username,
+				config.SipSettings.Password,
+				config.SipSettings.SipDomain,
+				config.SipSettings.ExternalDomain
+			);
+
+			for (int i = 0; i < config.SipSettings.CallCount; i++)
 			{
-				Console.WriteLine($"Starting call {i + 1} of {config.SipSettings.CallCount}");
-
-				// Prepare SIP call
-				var callDescriptor = new SIPCallDescriptor(
-					config.SipSettings.Username,
-					config.SipSettings.Password,
-					$"sip:{config.SipSettings.ExternalDomain}",
-					$"sip:{config.SipSettings.Username}@{config.SipSettings.SipDomain}",
-					null, // from display name
-					null, // to display name
-					null, // custom headers
-					SIPCallDirection.Out,
-					SDP.SDP_MIME_CONTENTTYPE,
-					null, // SDP body (null for now)
-					null, // auth username
-					null, // auth password
-					null, // proxy
-					null  // user agent
-				);
-
-				var userAgent = new SIPUserAgent(sipTransport, null);
-				string logFile = Path.Combine(config.LogSettings.LogDirectory, $"call_{i + 1}.log");
-				var sipLog = new StringWriter();
-
-				// Attach SIP message logging
-				EventHandler<SIPMessageEventArgs> logHandler = (s, e) =>
-				{
-					sipLog.WriteLine($"{e.Direction} {e.RemoteEndPoint}: {e.SIPMessage.StatusLine ?? e.SIPMessage.FirstLine}" );
-					sipLog.WriteLine(e.SIPMessage.RawMessage);
-				};
-				sipTransport.SIPMessageReceived += logHandler;
-				sipTransport.SIPMessageSent += logHandler;
-
-				try
-				{
-					// Place the call
-					bool callResult = await userAgent.InitiateCall(callDescriptor);
-					if (!callResult)
-					{
-						Console.WriteLine($"Call {i + 1} failed to initiate.");
-						continue;
-					}
-
-					// Wait for media negotiation (RTP about to start)
-					// For demo, wait for call to be confirmed (200 OK)
-					var callAnswered = await userAgent.WaitForCallAnswered();
-					if (callAnswered)
-					{
-						Console.WriteLine($"Call {i + 1} answered, disconnecting before RTP starts.");
-						await userAgent.Hangup();
-					}
-					else
-					{
-						Console.WriteLine($"Call {i + 1} not answered, moving on.");
-					}
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine($"Error during call {i + 1}: {ex.Message}");
-				}
-				finally
-				{
-					// Detach logging
-					sipTransport.SIPMessageReceived -= logHandler;
-					sipTransport.SIPMessageSent -= logHandler;
-					// Save SIP logs
-					await File.WriteAllTextAsync(logFile, sipLog.ToString());
-					Console.WriteLine($"Call {i + 1} completed and logs saved.");
-				}
+				Console.WriteLine($"Starting call {i + 1} of {config.SipSettings.CallCount}...");
+				await callMaker.MakeCall();
 			}
-            */
 
+			Console.WriteLine("Press Enter to exit...");
+			Console.ReadLine();
+
+	
 			// Cleanup
 			sipTransport.Shutdown();
 			Console.WriteLine("All calls completed.");
