@@ -134,6 +134,11 @@ CallTime,CallId,DestinationDomain,ResolvedDestinationIp,CallStatus,ResponseCode,
 "2025-09-01 09:42:45","call_001","target.example.com","192.0.2.149","Success","200 OK","198.51.100.48; 203.0.113.45","192.0.2.88","198.51.100.48; 203.0.113.166","198.51.100.18; 203.0.113.45","Example SIP Proxy","Example SIP Client","192.0.2.88; 198.51.100.48; 198.51.100.18; 203.0.113.166; 203.0.113.45"
 ```
 
+### IP Analysis Tool
+> **🔍 For detailed IP analysis and categorization, see [IP_ANALYSIS_README.md](IP_ANALYSIS_README.md)**
+> 
+> Use the included Ruby script to automatically analyze your CSV files and categorize unique IPs by their SIP/RTP functions.
+
 ## Use Cases
 
 ### Network Analysis
