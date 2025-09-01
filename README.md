@@ -1,10 +1,12 @@
 # SIP Load Tester with IP Logging
 
-A C# .NET application that performs SIP load testing while comprehensively logging all ### Sample CSV Output:
+A C# .NET application that performs SIP load testing while comprehensively logging all addresses used by external domains during SIP communication. This tool is particularly useful for analyzing network paths, endpoints, and infrastructure used by SIP providers.
+
+### Sample CSV Output:
 ```csv
 CallTime,CallId,DestinationDomain,ResolvedDestinationIp,CallStatus,ResponseCode,ContactHeaderIps,RecordRouteIps,ViaHeaderIps,SdpMediaIps,ServerHeader,UserAgent,AllDetectedIps
 "2025-09-01 09:42:45","call_001","target.example.com","192.0.2.149","Success","200 OK","198.51.100.48; 203.0.113.45","192.0.2.88","198.51.100.48; 203.0.113.166","198.51.100.18; 203.0.113.45","Example SIP Proxy","Example SIP Client","192.0.2.88; 198.51.100.48; 198.51.100.18; 203.0.113.166; 203.0.113.45"
-```dresses used by external domains during SIP communication. This tool is particularly useful for analyzing network paths, endpoints, and infrastructure used by SIP providers.
+```
 
 ## Features
 
