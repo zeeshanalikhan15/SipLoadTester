@@ -113,12 +113,17 @@ namespace SipLoadTester
 
 
 			// Make outbound calls using external domain
+			// Create CSV file path for IP logging
+			string csvFilePath = Path.Combine(config.LogSettings.LogDirectory, $"call_ips_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+			var sipMessageLogger = new SipMessageLogger(csvFilePath, sipTransport);
+
 			var callMaker = new CallMaker(
 				sipTransport,
 				config.SipSettings.Username,
 				config.SipSettings.Password,
 				config.SipSettings.SipDomain,
-				config.SipSettings.ExternalDomain
+				config.SipSettings.ExternalDomain,
+				sipMessageLogger
 			);
 
 			for (int i = 0; i < config.SipSettings.CallCount; i++)
@@ -127,6 +132,8 @@ namespace SipLoadTester
 				await callMaker.MakeCall();
 			}
 
+			Console.WriteLine($"All {config.SipSettings.CallCount} calls completed.");
+			Console.WriteLine($"IP logging data saved to: {csvFilePath}");
 			Console.WriteLine("Press Enter to exit...");
 			Console.ReadLine();
 
@@ -139,7 +146,7 @@ namespace SipLoadTester
 		static async Task<AppConfig> LoadConfig()
 		{
 			var configText = await File.ReadAllTextAsync("appsettings.json");
-			return JsonSerializer.Deserialize<AppConfig>(configText);
+			return JsonSerializer.Deserialize<AppConfig>(configText) ?? throw new InvalidOperationException("Failed to deserialize config");
 		}
 	}
 }

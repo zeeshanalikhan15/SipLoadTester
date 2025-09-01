@@ -17,20 +17,34 @@ namespace SipLoadTester
         private readonly string _password;
         private readonly string _sipDomain;
         private readonly string _externalDomain;
+        private readonly SipMessageLogger _sipMessageLogger;
 
-        public CallMaker(SIPTransport sipTransport, string username, string password, string sipDomain, string externalDomain)
+        public CallMaker(SIPTransport sipTransport, string username, string password, string sipDomain, string externalDomain, SipMessageLogger sipMessageLogger)
         {
             _sipTransport = sipTransport;
             _username = username;
             _password = password;
             _sipDomain = sipDomain;
             _externalDomain = externalDomain;
+            _sipMessageLogger = sipMessageLogger;
         }
 
         public async Task MakeCall()
         {
+            string callId = Guid.NewGuid().ToString();
+            string? resolvedDestinationIp = null;
+            
             try
             {
+                Console.WriteLine($"Starting call {callId} to {_externalDomain}");
+                
+                // Resolve destination IP
+                resolvedDestinationIp = await _sipMessageLogger.ResolveDestinationIp(_externalDomain);
+                Console.WriteLine($"Resolved {_externalDomain} to IP: {resolvedDestinationIp}");
+
+                // Start tracking this call
+                _sipMessageLogger.StartCall(callId, _externalDomain, resolvedDestinationIp);
+
                 var userAgent = new SIPUserAgent(_sipTransport, null);
 
                 var callDescriptor = new SIPCallDescriptor(
@@ -61,10 +75,19 @@ namespace SipLoadTester
                 var audioTrack = new MediaStreamTrack(SDPMediaTypesEnum.audio, false, audioFormats);
                 mediaSession.addTrack(audioTrack);
 
+                // Set up RTP event handlers to capture media IPs
+                mediaSession.OnRtpPacketReceived += (ep, mediaType, rtpPacket) => 
+                {
+                    if (ep != null)
+                    {
+                        _sipMessageLogger.AddRtpIp(callId, ep.Address.ToString());
+                    }
+                };
+
                 bool callResult = await userAgent.Call(callDescriptor, mediaSession);
                 if (callResult)
                 {
-                    Console.WriteLine($"Call to {_externalDomain} initiated successfully.");
+                    Console.WriteLine($"Call {callId} to {_externalDomain} initiated successfully.");
                     
                     // Wait a bit before hanging up (simulate call duration)
                     await Task.Delay(2000);
@@ -74,19 +97,32 @@ namespace SipLoadTester
                 }
                 else
                 {
-                    Console.WriteLine($"Call to {_externalDomain} failed to initiate.");
+                    Console.WriteLine($"Call {callId} to {_externalDomain} failed to initiate.");
                 }
                 
                 // Wait a moment for cleanup
                 await Task.Delay(500);
+                
+                // Finish tracking this call and log the data
+                await _sipMessageLogger.FinishCall(callId);
                 
                 // Clean up
                 userAgent.Close();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception during call to {_externalDomain}: {ex.Message}");
+                Console.WriteLine($"Exception during call {callId} to {_externalDomain}: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                // Finish tracking this call even on exception
+                try
+                {
+                    await _sipMessageLogger.FinishCall(callId);
+                }
+                catch (Exception logEx)
+                {
+                    Console.WriteLine($"Failed to finish call logging: {logEx.Message}");
+                }
             }
         }
     }
